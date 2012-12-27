@@ -1,0 +1,66 @@
+body {
+  background-color: #f9f9f9;
+  color: black;
+  font-size: 18px;
+  line-height: 1.4em;
+  font-family: Georgia;
+}
+
+.slide {
+
+}
+.slide h1 {
+  font-family: "Basic Gothic OT";
+  font-size: 1.4em;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: black;
+}
+.slide h1 .sub {
+  display: block;
+  font-size: 0.7em;
+  letter-spacing: 0;
+  padding-top: 7px;
+  color: #777;
+}
+
+.slide h2 {
+  font-size: 1.9em;
+  font-weight: normal;
+  border: none;
+  text-align: center;
+}
+
+.deck-container blockquote {
+  color: #000;
+  line-height: 1.4em;
+  font-size:1.5em;
+  padding:1em 2em;
+  border-left:5px solid #ccc;
+  text-indent: 1em;
+}
+.deck-container cite {
+  display: block;
+  margin-top: 1em;
+  font-size: 0.8em;
+  color: #888;
+  font-family: "Basic Gothic OT";
+}
+
+.deck-container pre,
+.deck-container code {
+  font-family: "Source Code Pro";
+}
+.deck-container i { font-style: italic; }
+pre strong {
+  color: red;
+}
+.deck-container p {
+  margin: 1em 0;
+}
+figcaption {
+  text-align: center;
+}
+.deck-container figure {
+  margin: 1em 0;
+}

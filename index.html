@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=1024, user-scalable=no">
+
+	<title>musical quicksort?</title>
+	<!-- Required stylesheet -->
+	<link rel="stylesheet" href="core/deck.core.css">
+	<!-- Extension CSS files go here. Remove or add as needed. -->
+	<link rel="stylesheet" href="extensions/goto/deck.goto.css">
+	<link rel="stylesheet" href="extensions/menu/deck.menu.css">
+	<link rel="stylesheet" href="extensions/navigation/deck.navigation.css">
+	<link rel="stylesheet" href="extensions/status/deck.status.css">
+	<link rel="stylesheet" href="extensions/hash/deck.hash.css">
+	<link rel="stylesheet" href="extensions/scale/deck.scale.css">
+
+	<!-- Transition theme. More available in /themes/transition/ or create your own. -->
+	<link rel="stylesheet" href="style.css">
+	<!-- Required Modernizr file -->
+	<script src="modernizr.custom.js"></script>
+</head>
+<body class="deck-container">
+
+<!-- Begin slides. Just make elements with a class of slide. -->
+
+<section class="slide">
+<h1>Musical Quicksort
+  <span class="sub">
+    Michael Hoy |
+    Boston Creative Coders |
+    December 2012
+  </span>
+</h1>
+</section>
+
+<section class="slide">
+<h1><strike>Musical Quicksort</strike><br>
+Hacking around in Extempore</h1>
+</section>
+
+
+<section class="slide">
+<figure>
+  <img src="img/extempore.png">
+</figure>
+</section>
+
+
+<section class="slide">
+<h2>Recursion</h2>
+</section>
+
+<section class="slide">
+<figure>
+  <img src="img/cells.jpg">
+  <figcaption>
+    Meristem of <i>Gnetum gnemon</i>
+    <cite>Photo: Stephanie Conway</cite>
+  </figcaption>
+</figure>
+</section>
+
+<section class="slide">
+<figure>
+  <img src="img/gnemon.jpg">
+  <figcaption>
+    Gnetum gnemon 
+    <cite>Photo: <a href="http://www.fobi.web.id/v/gymnospermae/f-gne/gne-gne/Gnetum-gnemon_Wonosari_ZA.jpg.html?g2_imageViewsIndex=1">www.fobi.web.id</a></cite>
+  </figcaption>
+</figure>
+</section>
+
+
+<section class="slide">
+<pre>
+; Division defined recursively
+(define div
+  (lambda (n d)
+    (cond
+      ((&lt; n d) 0)
+      (else
+        (+ 1 (div (- n d) d))))))
+</pre>
+</section>
+
+<section class="slide">
+<pre>
+; Division defined recursively
+(define div
+  (lambda (n d)
+    (cond
+      ((&lt; n d) 0)
+      (else
+        (+ 1 (div (- n d) d))))))
+
+(div 6 2)
+(+ 1 (div 4 2))
+(+ 1 (+ 1 (div 2 2)))
+(+ 1 (+ 1 (+ 1 (div 0 2)))
+(+ 1 (+ 1 (+ 1 0)))
+(+ 1 (+ 1 1))
+(+ 1 2)
+3
+
+</pre>
+</section>
+
+
+<section class="slide">
+<h2>Musical <code>quicksort</code></h2>
+</section>
+
+<section class="slide">
+<pre>
+(define quicksort
+  (lambda (l)
+    (let ((piv (pivot l)))
+      (if (equal? piv 'done) l
+        (let ((parts (prt piv l '() '())))
+          (append (quicksort (car parts))
+                  (quicksort (cadr parts))))))))
+</pre>
+</section>
+
+<section class="slide">
+<pre>
+(define pivot (lambda (l)
+  (cond ((null? l) 'done)
+  ((null? (cdr l)) 'done)
+        ((&lt;= (car l) (cadr l)) (pivot (cdr l)))
+  (#t (car l)))))
+
+(pivot '(1 2 3 4 3 7)) =&gt; 4
+(pivot '(1 2 3 4))     =&gt; 'done
+</pre>
+</section>
+
+<section class="slide">
+<pre>
+(define prt (lambda (piv l p1 p2)
+  (if (null? l) (list p1 p2)
+     (if (&lt; (car l) piv) (prt piv (cdr l) (cons (car l) p1) p2)
+   (prt piv (cdr l) p1 (cons (car l) p2))))))
+
+(prt 4 '(1 2 3 4 3 7) '() '())
+  =&gt; ((3 3 2 1) (7 4))
+</pre>
+</section>
+
+<section class="slide">
+<pre>
+(define quicksort
+  (lambda (l)
+    (let ((piv (pivot l)))
+      (if (equal? piv 'done) l
+        (let ((parts (prt piv l '() '())))
+          (append (quicksort (car parts))
+                  (quicksort (cadr parts))))))))
+</pre>
+</section>
+
+<section class="slide">
+<pre>
+(quicksort '(0 3 -21 0 -5 -2 -12)) =&gt; (-21 -12 -5 -2 0 0 3) 
+</pre>
+</section>
+
+<section class="slide">
+<pre>
+
+      (0 <strong>3</strong> -21 0 -5 -2 -12)
+        |                 |
+    (-12 <strong>-2</strong> -5 0 -21 0)   (<strong>3</strong>)
+     |             |
+   (-21 <strong>-5</strong> -12)   (0 <strong>0</strong> -2)
+      |      |      |    |
+  (<strong>-12</strong> -21) (<strong>-5</strong>)   (<strong>-2</strong>) (<strong>0 0</strong>)
+    |  |
+(<strong>-21</strong>)  (<strong>-12</strong>) 
+
+
+</pre>
+</section>
+
+<section class="slide">
+<pre>
+(define quicksort
+  (lambda (l)
+    <strong>(define iter
+      (lambda (l x y)</strong>
+        (let ((piv (pivot l)))
+          (if (eq? 'done piv) <strong>((lambda () 
+              (play-recursive-note 
+                (list (car l)) 
+                (+ 1 x) 
+                (+ 1 y))
+              l))</strong>
+            (let ((parts (qpartition piv l '() '())))
+              <strong>(play-recursive-note (list piv) x y)</strong>
+              (append (<strong>iter</strong> (car parts)  <strong>(- x 1) (+ 1 y)</strong>)
+                      (<strong>iter</strong> (cadr parts) <strong>(+ x 1) (+ 1 y)</strong>)))))))
+    (iter l 0 0)))
+
+</pre>
+</section>
+
+<section class="slide">
+<pre>
+(define play-recursive-note
+  (lambda (l x y)
+      (play-note
+        (now)                            ; When
+        synth                            ; Instrument
+        60                               ; Note
+        90                               ; Volume
+        (* 0.15 *second*))))             ; Duration
+</pre>
+</section>
+
+<section class="slide">
+<pre>
+(define play-recursive-note
+  (lambda (l x y)
+      (play-note
+        <strong>(+ </strong>(now)<strong> (* y (* 0.3 *second*)))</strong> ; When
+        synth                            ; Instrument
+        <strong>(+ (car l)</strong> 60<strong>)</strong>                   ; Note
+        <strong>(- </strong>90<strong> (* y 10))</strong>                  ; Volume
+        (* 0.15 *second*))))             ; Duration
+</pre>
+</section>
+
+<section class="slide">
+<pre>
+(define play-recursive-note
+  (lambda (l x y)
+    <strong>(cond ((&gt; 40 (abs (car l)))</strong>
+           (play-note
+             (+ (now) (* y (* 0.3 *second*))) ; When
+             synth                            ; Instrument
+             (+ (car l) 60)                   ; Note
+             (- 90 (* y 10))                  ; Volume
+             (* 0.15 *second*)))             ; Duration
+    <strong>(else
+      '()))))</strong>
+</pre>
+</section>
+
+<section class="slide">
+<pre>
+(define loop
+  (lambda ()
+    (quicksort '(0 3 -21 0 -5 -2 -12))
+    (callback (+ (now) (* (* 6 0.3) *second*)) 'loop)))
+(loop)
+</pre>
+</section>
+
+<section class="slide">
+<h2>[insert live coding music.]</h2>
+</section>
+
+
+<section class="slide">
+<blockquote>
+The ability to visualize the consequences of [actions]
+  is crucial to becoming an expert programmer, just as it is
+  in any synthetic, creative activity...<br><br>
+  To become experts, we must learn to visualize the
+    processes generated by various types of procedures.
+
+  <cite>
+    — Structure and Interpretation of Computer Programs
+  </cite>
+</blockquote>
+</section>
+
+<section class="slide">
+<figure>
+  <img src="img/cells.jpg">
+  <figcaption>
+    Meristem of <i>Gnetum gnemon</i>
+    <cite>Photo: Stephanie Conway</cite>
+  </figcaption>
+</figure>
+</section>
+
+<section class="slide">
+<figure>
+  <img src="img/leaf.jpg">
+  <figcaption>
+    European Beech leaf
+  </figcaption>
+</figure>
+</section>
+
+<!-- End slides. -->
+
+
+<!-- Begin extension snippets. Add or remove as needed. -->
+
+<!-- deck.hash snippet -->
+<a href="." title="Permalink to this slide" class="deck-permalink">#</a>
+
+<!-- End extension snippets. -->
+
+
+<!-- Required JS files. -->
+<script src="jquery-1.7.2.min.js"></script>
+<script src="core/deck.core.js"></script>
+
+<!-- Extension JS files. Add or remove as needed. -->
+<script src="../core/deck.core.js"></script>
+<script src="../extensions/hash/deck.hash.js"></script>
+
+<!-- Initialize the deck. You can put this in an external file if desired. -->
+<script>
+	$(function() {
+		$.deck('.slide');
+	});
+</script>
+</body>
+</html>
