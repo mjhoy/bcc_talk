@@ -1,0 +1,85 @@
+; -- Setup --
+
+; First step - load the instruments. This may take a while.
+(load "libs/core/instruments.xtm")
+
+; Define our instrument.
+(define-instrument synth synth_note_c synth_fx)
+
+; Basic DSP.
+(bind-func dsp:DSP
+  (lambda (in time chan dat)
+    (synth in time chan dat)))
+(dsp:set! dsp)
+
+; Now this should play a note:
+(play-note (now) synth 60 100 (* 1 *second*))
+
+; -- Quicksort --
+
+; Helper functions:
+(define pivot (lambda (l)
+  (cond ((null? l) 'done)
+  ((null? (cdr l)) 'done)
+        ((<= (car l) (cadr l)) (pivot (cdr l)))
+  (#t (car l)))))
+
+(define prt (lambda (piv l p1 p2)
+  (if (null? l) (list p1 p2)
+     (if (< (car l) piv) (prt piv (cdr l) (cons (car l) p1) p2)
+   (prt piv (cdr l) p1 (cons (car l) p2))))))
+
+; Basic quicksort
+(define quicksort
+  (lambda (l)
+    (let ((piv (pivot l)))
+      (if (equal? piv 'done) l
+        (let ((parts (prt piv l '() '())))
+          (append (quicksort (car parts))
+                  (quicksort (cadr parts))))))))
+
+; Should output (4 5 6 8 10 12)
+(println (quicksort '(10 4 12 5 8 6)))
+
+; -- Music in Quicksort --
+
+; Helper play-note function
+(define play-recursive-note
+  (lambda (l x y)
+    (cond ((> 40 (abs (car l)))
+           (play-note
+             (+ (now) (* y (* 0.3 *second*))) ; When
+             synth                            ; Instrument
+             (+ (car l) 60)                   ; Note
+             (- 90 (* y 10))                  ; Volume
+             (* 0.15 *second*)))             ; Duration
+    (else
+      '()))))
+
+; Quicksort that plays a note
+(define quicksort
+  (lambda (l)
+    (define iter
+      (lambda (l x y)
+        (let ((piv (pivot l)))
+          (if (eq? 'done piv) ((lambda () 
+              (play-recursive-note (list (car l)) (+ 1 x) (+ 1 y))
+              l))
+            (let ((parts (prt piv l '() '())))
+              (play-recursive-note (list piv) x y)
+              (append (iter (car parts)  (- x 1) (+ 1 y))
+                      (iter (cadr parts) (+ x 1) (+ 1 y))))))))
+    (iter l 0 0)))
+
+; Now, this should play music.
+(quicksort '(7 9 5 17 12 10 -7))
+
+; In a loop:
+(define loop
+  (lambda ()
+    (quicksort '(17 9 5 17 19 12 -9))
+    (callback (+ (now) (* (* 5 0.3) *second*)) 'loop)))
+
+; Execute this to run the loop. You may redefine the
+; loop body while the loop is running.
+(loop)
